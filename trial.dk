@@ -1,0 +1,46 @@
+#NAME trial.
+
+Utype : Type.
+Ukind : Type.
+
+def etype : Utype -> Type.
+def ekind : Ukind -> Type.
+
+type : Ukind.
+
+
+(; Pi types ;)
+Pi : A:Utype -> B:(etype A -> Utype) -> Utype.
+
+[A,B] etype (Pi A B) --> w:etype A -> etype (B w).
+#SNF A:Utype -> B:Utype -> etype (Pi A (x:etype A=>B)).
+
+(; Interval type ;)
+I : Type.
+0 : I.
+1 : I.
+
+
+(; Path types ;)
+Path 	: A:Utype -> etype A -> etype A -> Utype.
+def pathabs	: A:Utype -> t:(I -> etype A) -> etype (Path A (t 0) (t 1)).
+def pathapp : A:Utype -> x:etype A -> y:etype A -> p:etype (Path A x y)
+	-> I -> etype A.
+[A,t,r] pathapp A _ _ (pathabs A t) r --> t r.
+[A,p,u0,u1] pathapp A u0 u1 p 0 --> u0.
+[A,p,u0,u1] pathapp A u0 u1 p 1 --> u1.
+
+
+(; Thm. Functions preserve paths. ;)
+def ap : A:Utype -> B:Utype ->
+       	 f:etype (Pi A (x:etype A=>B)) ->
+       	 a:etype A -> b:etype A ->
+	 p:etype (Path A a b)
+       -> etype (Path B (f a) (f b))
+
+:=     A:Utype => B:Utype =>
+       f:(etype A -> etype B) =>
+       a:etype A => b:etype A =>
+       p:etype (Path A a b) =>
+       pathabs B (i:I => f (pathapp A a b p i)).
+	
